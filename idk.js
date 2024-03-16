@@ -28,6 +28,8 @@ function renderThing(url) {
                                 outputDiv.style.zIndex = '9999';
                                 outputDiv.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.3)';
                                 outputDiv.style.transition = 'transform 0.3s ease-in-out';
+                                outputDiv.style.animation = 'fadeInDown 0.5s ease';
+
                                 document.body.appendChild(outputDiv);
 
                                 let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
@@ -67,11 +69,7 @@ function renderThing(url) {
                             outputDiv.innerHTML = '';
 
                             outputDiv.appendChild(createElement('p', `Welcome <span style="color: #3366ff; font-weight: bold;">${name}</span>`));
-                            outputDiv.appendChild(createElement('p', `${questionIdFromApi}. ${question.question.text}`));function createElement(tagName, innerHTML) {
-                                const element = document.createElement(tagName);
-                                element.innerHTML = innerHTML;
-                                return element;
-                            }
+                            outputDiv.appendChild(createElement('p', `${questionIdFromApi}. ${question.question.text}`));
 
                             question.answers.forEach((answer, answerIndex) => {
                                 const answerText = document.createElement('p');
@@ -84,6 +82,12 @@ function renderThing(url) {
             })
             .catch(error => console.error('Error fetching data:', error));
     }
+}
+
+function createElement(tagName, innerHTML) {
+    const element = document.createElement(tagName);
+    element.innerHTML = innerHTML;
+    return element;
 }
 
 const urlSuffix = prompt("Enter the last part of the URL:");
