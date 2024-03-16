@@ -29,35 +29,60 @@ function renderThing(url) {
                                 outputDiv.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.5), 0 0 40px rgba(255, 255, 255, 0.5), 0 0 60px rgba(255, 255, 255, 0.5), 0 0 80px rgba(255, 255, 255, 0.5)';
                                 document.body.appendChild(outputDiv);
 
-                                let initialPinchDistance = 0;
-                                let initialWidth = outputDiv.offsetWidth;
-                                let initialHeight = outputDiv.offsetHeight;
+                                let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+                                let initialDistance = 0;
 
-                                function pinchToZoom(e) {
-                                    if (e.touches.length === 2) {
-                                        const touch1 = e.touches[0];
-                                        const touch2 = e.touches[1];
-                                        const currentPinchDistance = Math.hypot(touch2.clientX - touch1.clientX, touch2.clientY - touch1.clientY);
-                                        if (initialPinchDistance === 0) {
-                                            initialPinchDistance = currentPinchDistance;
+                                function dragElement(e) {
+                                    e = e || window.event;
+                                    e.preventDefault();
+                                    if (e.touches && e.touches.length === 2) {
+                                        let x1 = e.touches[0].clientX;
+                                        let y1 = e.touches[0].clientY;
+                                        let x2 = e.touches[1].clientX;
+                                        let y2 = e.touches[1].clientY;
+                                        let distance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+                                        if (initialDistance === 0) {
+                                            initialDistance = distance;
                                         } else {
-                                            const scaleFactor = currentPinchDistance / initialPinchDistance;
-                                            const newWidth = initialWidth * scaleFactor;
-                                            const newHeight = initialHeight * scaleFactor;
-                                            outputDiv.style.width = newWidth + 'px';
-                                            outputDiv.style.height = newHeight + 'px';
+                                            let scaleFactor = distance / initialDistance;
+                                            outputDiv.style.transform = `scale(${scaleFactor})`;
                                         }
+                                    } else {
+                                        pos3 = e.clientX || e.touches[0].clientX;
+                                        pos4 = e.clientY || e.touches[0].clientY;
+                                        document.onmouseup = closeDragElement;
+                                        document.ontouchend = closeDragElement;
+                                        document.onmousemove = elementDrag;
+                                        document.ontouchmove = elementDrag;
                                     }
                                 }
 
-                                function resetPinch() {
-                                    initialPinchDistance = 0;
-                                    initialWidth = outputDiv.offsetWidth;
-                                    initialHeight = outputDiv.offsetHeight;
+                                function elementDrag(e) {
+                                    e = e || window.event;
+                                    e.preventDefault();
+                                    if (e.touches && e.touches.length === 2) {
+                                    } else {
+                                        pos1 = pos3 - (e.clientX || e.touches[0].clientX);
+                                        pos2 = pos4 - (e.clientY || e.touches[0].clientY);
+                                        pos3 = e.clientX || e.touches[0].clientX;
+                                        pos4 = e.clientY || e.touches[0].clientY;
+                                        outputDiv.style.top = (outputDiv.offsetTop - pos2) + "px";
+                                        outputDiv.style.left = (outputDiv.offsetLeft - pos1) + "px";
+                                    }
                                 }
 
-                                outputDiv.addEventListener('touchmove', pinchToZoom);
-                                outputDiv.addEventListener('touchend', resetPinch);
+                                function closeDragElement() {
+                                    document.onmouseup = null;
+                                    document.ontouchend = null;
+                                    document.onmousemove = null;
+                                    document.ontouchmove = null;
+                                    initialDistance = 0;
+                                }
+
+                                outputDiv.onmousedown = dragElement;
+                                outputDiv.ontouchstart = dragElement;
+
+                                outputDiv.onwheel = dragElement;
                             }
                             outputDiv.innerHTML = '';
                             var nameText = document.createElement('p');
