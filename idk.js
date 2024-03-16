@@ -12,63 +12,46 @@ function renderThing(url) {
                     data.data.forEach((question, index) => {
                         const questionIdFromApi = index + 1;
                         if (questionIdFromApi === questionIdFromDom) {
-                            var outputDiv = document.querySelector('.rendered-question-answers');
+                            let outputDiv = document.querySelector('.rendered-question-answers');
                             if (!outputDiv) {
                                 outputDiv = document.createElement('div');
                                 outputDiv.className = 'rendered-question-answers';
                                 outputDiv.style.position = 'fixed';
                                 outputDiv.style.top = '10px';
                                 outputDiv.style.left = '50%';
-                                outputDiv.style.transform = 'translateX(-50%)';
+                                outputDiv.style.transform = 'translate(-50%, -50%)';
                                 outputDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
                                 outputDiv.style.padding = '20px';
                                 outputDiv.style.borderRadius = '10px';
                                 outputDiv.style.width = '80%';
                                 outputDiv.style.maxWidth = '400px';
                                 outputDiv.style.zIndex = '9999';
-                                outputDiv.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.5), 0 0 40px rgba(255, 255, 255, 0.5), 0 0 60px rgba(255, 255, 255, 0.5), 0 0 80px rgba(255, 255, 255, 0.5)';
+                                outputDiv.style.boxShadow = '0 0 20px rgba(0, 0, 0, 0.3)';
+                                outputDiv.style.transition = 'transform 0.3s ease-in-out';
                                 document.body.appendChild(outputDiv);
 
                                 let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-                                let initialDistance = 0;
 
                                 function dragElement(e) {
                                     e = e || window.event;
                                     e.preventDefault();
-                                    if (e.touches && e.touches.length === 2) {
-                                        let x1 = e.touches[0].clientX;
-                                        let y1 = e.touches[0].clientY;
-                                        let x2 = e.touches[1].clientX;
-                                        let y2 = e.touches[1].clientY;
-                                        let distance = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
-                                        if (initialDistance === 0) {
-                                            initialDistance = distance;
-                                        } else {
-                                            let scaleFactor = distance / initialDistance;
-                                            outputDiv.style.transform = `scale(${scaleFactor})`;
-                                        }
-                                    } else {
-                                        pos3 = e.clientX || e.touches[0].clientX;
-                                        pos4 = e.clientY || e.touches[0].clientY;
-                                        document.onmouseup = closeDragElement;
-                                        document.ontouchend = closeDragElement;
-                                        document.onmousemove = elementDrag;
-                                        document.ontouchmove = elementDrag;
-                                    }
+                                    pos3 = e.clientX || e.touches[0].clientX;
+                                    pos4 = e.clientY || e.touches[0].clientY;
+                                    document.onmouseup = closeDragElement;
+                                    document.ontouchend = closeDragElement;
+                                    document.onmousemove = elementDrag;
+                                    document.ontouchmove = elementDrag;
                                 }
 
                                 function elementDrag(e) {
                                     e = e || window.event;
                                     e.preventDefault();
-                                    if (e.touches && e.touches.length === 2) {
-                                    } else {
-                                        pos1 = pos3 - (e.clientX || e.touches[0].clientX);
-                                        pos2 = pos4 - (e.clientY || e.touches[0].clientY);
-                                        pos3 = e.clientX || e.touches[0].clientX;
-                                        pos4 = e.clientY || e.touches[0].clientY;
-                                        outputDiv.style.top = (outputDiv.offsetTop - pos2) + "px";
-                                        outputDiv.style.left = (outputDiv.offsetLeft - pos1) + "px";
-                                    }
+                                    pos1 = pos3 - (e.clientX || e.touches[0].clientX);
+                                    pos2 = pos4 - (e.clientY || e.touches[0].clientY);
+                                    pos3 = e.clientX || e.touches[0].clientX;
+                                    pos4 = e.clientY || e.touches[0].clientY;
+                                    outputDiv.style.top = (outputDiv.offsetTop - pos2) + "px";
+                                    outputDiv.style.left = (outputDiv.offsetLeft - pos1) + "px";
                                 }
 
                                 function closeDragElement() {
@@ -76,25 +59,22 @@ function renderThing(url) {
                                     document.ontouchend = null;
                                     document.onmousemove = null;
                                     document.ontouchmove = null;
-                                    initialDistance = 0;
                                 }
 
                                 outputDiv.onmousedown = dragElement;
                                 outputDiv.ontouchstart = dragElement;
-
-                                outputDiv.onwheel = dragElement;
                             }
                             outputDiv.innerHTML = '';
-                            var nameText = document.createElement('p');
-                            nameText.textContent = `Name: ${name}`;
-                            nameText.style.fontWeight = 'bold';
-                            outputDiv.appendChild(nameText);
-                            var questionText = document.createElement('p');
-                            questionText.textContent = `${questionIdFromApi}. ${question.question.text}`;
-                            questionText.style.borderRadius = '100';
-                            outputDiv.appendChild(questionText);
+
+                            outputDiv.appendChild(createElement('p', `Welcome <span style="color: #3366ff; font-weight: bold;">${name}</span>`));
+                            outputDiv.appendChild(createElement('p', `${questionIdFromApi}. ${question.question.text}`));function createElement(tagName, innerHTML) {
+                                const element = document.createElement(tagName);
+                                element.innerHTML = innerHTML;
+                                return element;
+                            }
+
                             question.answers.forEach((answer, answerIndex) => {
-                                var answerText = document.createElement('p');
+                                const answerText = document.createElement('p');
                                 answerText.textContent = `${String.fromCharCode(97 + answerIndex)}. ${answer.text}`;
                                 outputDiv.appendChild(answerText);
                             });
@@ -112,5 +92,5 @@ if (urlSuffix) {
     renderThing(url);
     setInterval(() => {
         renderThing(url);
-    }, 1000);
+    }, 500);
 }
