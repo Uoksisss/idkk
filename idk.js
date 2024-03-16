@@ -30,16 +30,29 @@ function renderThing(url) {
                                 document.body.appendChild(outputDiv);
 
                                 let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+                                let initialDistance = 0;
 
                                 function dragElement(e) {
                                     e = e || window.event;
                                     e.preventDefault();
-                                    pos3 = e.clientX || e.touches[0].clientX;
-                                    pos4 = e.clientY || e.touches[0].clientY;
-                                    document.onmouseup = closeDragElement;
-                                    document.ontouchend = closeDragElement;
-                                    document.onmousemove = elementDrag;
-                                    document.ontouchmove = elementDrag;
+                                    if (e.type === "touchmove" && e.touches.length >= 2) {
+                                        let touch1 = e.touches[0];
+                                        let touch2 = e.touches[1];
+                                        let distance = Math.sqrt(Math.pow(touch2.clientX - touch1.clientX, 2) + Math.pow(touch2.clientY - touch1.clientY, 2));
+                                        if (initialDistance === 0) {
+                                            initialDistance = distance;
+                                        } else {
+                                            let scale = distance / initialDistance;
+                                            outputDiv.style.transform = `scale(${scale}) translate(-50%, -50%)`;
+                                        }
+                                    } else {
+                                        pos3 = e.clientX || e.touches[0].clientX;
+                                        pos4 = e.clientY || e.touches[0].clientY;
+                                        document.onmouseup = closeDragElement;
+                                        document.ontouchend = closeDragElement;
+                                        document.onmousemove = elementDrag;
+                                        document.ontouchmove = elementDrag;
+                                    }
                                 }
 
                                 function elementDrag(e) {
@@ -54,6 +67,7 @@ function renderThing(url) {
                                 }
 
                                 function closeDragElement() {
+                                    initialDistance = 0;
                                     document.onmouseup = null;
                                     document.ontouchend = null;
                                     document.onmousemove = null;
