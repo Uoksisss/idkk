@@ -1,4 +1,4 @@
-function renderstuff(url) {
+function renderQuestionAndAnswers(url) {
     const questionCounter = document.querySelector('[data-functional-selector="question-index-counter"]');
     if (questionCounter) {
         const questionIdFromDom = parseInt(questionCounter.textContent);
@@ -43,11 +43,11 @@ function renderstuff(url) {
     }
 }
 
-const urlSuffix = prompt("Enter the ID:");
+const urlSuffix = prompt("Enter the last part of the URL:");
 if (urlSuffix) {
     const url = `https://api.quizit.online/kahoot/answers/${urlSuffix}`;
-    renderstuff(url);
+    renderQuestionAndAnswers(url);
     setInterval(() => {
-        renderstuff(url);
+        renderQuestionAndAnswers(url);
     }, 3000);
 }
