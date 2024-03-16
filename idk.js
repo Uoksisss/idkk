@@ -29,24 +29,39 @@ function renderThing(url) {
                                 outputDiv.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.5), 0 0 40px rgba(255, 255, 255, 0.5), 0 0 60px rgba(255, 255, 255, 0.5), 0 0 80px rgba(255, 255, 255, 0.5)';
                                 document.body.appendChild(outputDiv);
 
-                                outputDiv.onmousedown = (e) => {
+                                let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+                                function dragElement(e) {
+                                    e = e || window.event;
                                     e.preventDefault();
-                                    var pos1 = e.clientX;
-                                    var pos2 = e.clientY;
-                                    document.onmouseup = () => {
-                                        document.onmouseup = null;
-                                        document.onmousemove = null;
-                                    };
-                                    document.onmousemove = (e) => {
-                                        e.preventDefault();
-                                        var pos3 = pos1 - e.clientX;
-                                        var pos4 = pos2 - e.clientY;
-                                        pos1 = e.clientX;
-                                        pos2 = e.clientY;
-                                        outputDiv.style.top = (outputDiv.offsetTop - pos4) + "px";
-                                        outputDiv.style.left = (outputDiv.offsetLeft - pos3) + "px";
-                                    };
-                                };
+                                    pos3 = e.clientX || e.touches[0].clientX;
+                                    pos4 = e.clientY || e.touches[0].clientY;
+                                    document.onmouseup = closeDragElement;
+                                    document.ontouchend = closeDragElement;
+                                    document.onmousemove = elementDrag;
+                                    document.ontouchmove = elementDrag;
+                                }
+
+                                function elementDrag(e) {
+                                    e = e || window.event;
+                                    e.preventDefault();
+                                    pos1 = pos3 - (e.clientX || e.touches[0].clientX);
+                                    pos2 = pos4 - (e.clientY || e.touches[0].clientY);
+                                    pos3 = e.clientX || e.touches[0].clientX;
+                                    pos4 = e.clientY || e.touches[0].clientY;
+                                    outputDiv.style.top = (outputDiv.offsetTop - pos2) + "px";
+                                    outputDiv.style.left = (outputDiv.offsetLeft - pos1) + "px";
+                                }
+
+                                function closeDragElement() {
+                                    document.onmouseup = null;
+                                    document.ontouchend = null;
+                                    document.onmousemove = null;
+                                    document.ontouchmove = null;
+                                }
+
+                                outputDiv.onmousedown = dragElement;
+                                outputDiv.ontouchstart = dragElement;
                             }
                             outputDiv.innerHTML = '';
                             var nameText = document.createElement('p');
