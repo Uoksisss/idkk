@@ -1,5 +1,8 @@
-function renderQuestionAndAnswers(url) {
+function renderThing(url) {
     const questionCounter = document.querySelector('[data-functional-selector="question-index-counter"]');
+    const spanElement = document.querySelector('span[data-functional-selector="nickname"].bottom-bar__NicknameSection-sc-nic2t-3');
+    const name = spanElement ? spanElement.textContent.trim() : "Anonymous"; // if the name element not found, use anonymous
+
     if (questionCounter) {
         const questionIdFromDom = parseInt(questionCounter.textContent);
         fetch(url)
@@ -20,15 +23,37 @@ function renderQuestionAndAnswers(url) {
                                 outputDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
                                 outputDiv.style.padding = '20px';
                                 outputDiv.style.borderRadius = '10px';
-                                outputDiv.style.boxShadow = '0 0 10px rgba(0, 0, 0, 0.5)';
                                 outputDiv.style.width = '80%';
                                 outputDiv.style.maxWidth = '400px';
                                 outputDiv.style.zIndex = '9999';
+                                outputDiv.style.boxShadow = '0 0 20px rgba(255, 255, 255, 0.5), 0 0 40px rgba(255, 255, 255, 0.5), 0 0 60px rgba(255, 255, 255, 0.5), 0 0 80px rgba(255, 255, 255, 0.5)';
                                 document.body.appendChild(outputDiv);
+
+                                outputDiv.onmousedown = (e) => {
+                                    e.preventDefault();
+                                    var pos1 = e.clientX;
+                                    var pos2 = e.clientY;
+                                    document.onmouseup = () => {
+                                        document.onmouseup = null;
+                                        document.onmousemove = null;
+                                    };
+                                    document.onmousemove = (e) => {
+                                        e.preventDefault();
+                                        var pos3 = pos1 - e.clientX;
+                                        var pos4 = pos2 - e.clientY;
+                                        pos1 = e.clientX;
+                                        pos2 = e.clientY;
+                                        outputDiv.style.top = (outputDiv.offsetTop - pos4) + "px";
+                                        outputDiv.style.left = (outputDiv.offsetLeft - pos3) + "px";
+                                    };
+                                };
                             }
+                            outputDiv.innerHTML = '';
+                            var nameText = document.createElement('p');
+                            nameText.textContent = `Name: ${name}`;
+                            outputDiv.appendChild(nameText);
                             var questionText = document.createElement('p');
                             questionText.textContent = `${questionIdFromApi}. ${question.question.text}`;
-                            outputDiv.innerHTML = '';
                             outputDiv.appendChild(questionText);
                             question.answers.forEach((answer, answerIndex) => {
                                 var answerText = document.createElement('p');
@@ -46,8 +71,8 @@ function renderQuestionAndAnswers(url) {
 const urlSuffix = prompt("Enter the last part of the URL:");
 if (urlSuffix) {
     const url = `https://api.quizit.online/kahoot/answers/${urlSuffix}`;
-    renderQuestionAndAnswers(url);
+    renderThing(url);
     setInterval(() => {
-        renderQuestionAndAnswers(url);
+        renderThing(url);
     }, 3000);
 }
